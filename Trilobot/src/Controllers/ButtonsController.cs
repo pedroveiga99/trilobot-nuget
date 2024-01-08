@@ -1,6 +1,7 @@
 ﻿using Iot.Device.Button;
 using System.Device.Gpio;
 using System.Device.Pwm.Drivers;
+using UnitsNet;
 
 namespace Trilobot.Controllers;
 public class ButtonsController
@@ -12,6 +13,7 @@ public class ButtonsController
 
     readonly Dictionary<TrilobotButton, SoftwarePwmChannel> ledPwmMapping = [];
     readonly Dictionary<TrilobotButton, GpioButton> buttons = [];
+    readonly Dictionary<TrilobotButton, bool> buttonHoldingState = [];
 
     public event ButtonPressed? OnButtonPressed;
     public event ButtonPressed? OnButtonDoublePressed;
@@ -36,6 +38,7 @@ public class ButtonsController
 
     public ButtonsController() : this(new GpioController()) { }
 
+    #region Button
     private void SetupButton(TrilobotButton button)
     {
         int pinNumber = button switch
@@ -63,6 +66,7 @@ public class ButtonsController
 
         // Add to dict
         buttons.Add(button, gpioButton);
+        buttonHoldingState.Add(button, false);
     }
 
     private void Button_DoublePress(TrilobotButton button) =>
@@ -76,15 +80,28 @@ public class ButtonsController
         switch (e.HoldingState)
         {
             case ButtonHoldingState.Started:
+                buttonHoldingState[button] = true;
                 OnButtonHolding?.Invoke(button);
                 break;
             case ButtonHoldingState.Completed:
+                buttonHoldingState[button] = false;
                 break;
             case ButtonHoldingState.Canceled:
+                buttonHoldingState[button] = false;
                 break;
         }
     }
 
+    /// <summary>
+    /// Checks if the user is holding the button
+    /// </summary>
+    /// <param name="button"></param>
+    /// <returns>Button holding state</returns>
+    public bool GetHoldingState(TrilobotButton button) => buttonHoldingState[button];
+
+    #endregion
+
+    #region Button LEDs
     private void SetupButtonLeds(TrilobotButton button)
     {
         int pinNumber = button switch
@@ -107,23 +124,45 @@ public class ButtonsController
     /// </summary>
     /// <param name="button">ID of the button to set the state to</param>
     /// <param name="brightness">Brightness value between 0.0 and 1.0</param>
-    /// <exception cref="InvalidOperationException"></exception>
     public void SetButtonLed(TrilobotButton button, double brightness)
     {
-        if (brightness < 0 || brightness > 1)
-            throw new InvalidOperationException("Brightness should be a value between 0 and 1");
+        // Limit the brightness value rather than throw a value exception
+        double actualBrightness = Math.Max(Math.Min(brightness, 1), 0);
 
-        ledPwmMapping[button].DutyCycle = brightness;
+        ledPwmMapping[button].DutyCycle = actualBrightness;
     }
 
     /// <summary>
-    /// Turns the given button LED to ON or OFF
+    /// Turns the given button LED to ON or OFF at full brighness
     /// </summary>
     /// <param name="button">ID of the button to set the state to</param>
-    /// <param name="brightness">Brightness value between 0.0 and 1.0</param>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <param name="state">Turns ON or OFF at full brighness</param>
     public void SetButtonLed(TrilobotButton button, bool state) =>
         SetButtonLed(button, state ? 1 : 0);
+
+    /// <summary>
+    /// Turns the all button LEDs to ON or OFF at full brighness
+    /// </summary>
+    /// <param name="state">Turns ON or OFF at full brighness</param>
+    public void SetAllButtonLeds(bool state)
+    {
+        foreach (TrilobotButton pin in Enum.GetValues(typeof(TrilobotButton)))
+        {
+            SetButtonLed(pin, state);
+        }
+    }
+
+    /// <summary>
+    /// Turns the all button LEDs to a brighness value
+    /// </summary>
+    /// <param name="brightness">Brightness value between 0.0 and 1.0</param>
+    public void SetAllButtonLeds(double brightness)
+    {
+        foreach (TrilobotButton pin in Enum.GetValues(typeof(TrilobotButton)))
+        {
+            SetButtonLed(pin, brightness);
+        }
+    }
 
     /// <summary>
     /// Turns ON all button LEDs, waits the interval given, turns OFF all button LEDs
@@ -131,16 +170,12 @@ public class ButtonsController
     /// <param name="interval">Interval that the LEDs are turned ON</param>
     public async Task BlinkButtonLeds(TimeSpan interval)
     {
-        foreach (TrilobotButton pin in Enum.GetValues(typeof(TrilobotButton)))
-        {
-            SetButtonLed(pin, true);
-        }
+        SetAllButtonLeds(true);
         await Task.Delay(interval);
-        foreach (TrilobotButton pin in Enum.GetValues(typeof(TrilobotButton)))
-        {
-            SetButtonLed(pin, false);
-        }
+        SetAllButtonLeds(false);
     }
+
+    #endregion
 
     public void Dispose()
     {
