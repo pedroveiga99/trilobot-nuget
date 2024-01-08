@@ -12,6 +12,7 @@ public class TrilobotController : IDisposable
     public readonly MotorsController motors;
     public readonly ButtonsController buttons;
     public readonly UnderlightController leds;
+    public readonly UltrasoundController ultrasound;
 
     public TrilobotController()
     {
@@ -25,6 +26,9 @@ public class TrilobotController : IDisposable
 
         // Setup underlight
         leds = new();
+
+        // Setup ultrasound
+        ultrasound = new(gpio);
     }
 
     public void Close()
