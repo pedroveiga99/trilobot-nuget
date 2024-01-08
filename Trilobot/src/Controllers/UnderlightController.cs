@@ -1,4 +1,6 @@
-﻿namespace Trilobot.Controllers;
+﻿using System.Drawing;
+
+namespace Trilobot.Controllers;
 public class UnderlightController : Sn3218Controller
 {
     readonly double[] Underlights;
@@ -13,6 +15,8 @@ public class UnderlightController : Sn3218Controller
         EnableLeds();
         Disable();
     }
+
+    #region Basic Commands
 
     /// <summary>
     /// Shows the previously stored colors on Trilobot's underlights
@@ -59,6 +63,45 @@ public class UnderlightController : Sn3218Controller
     }
 
     /// <summary>
+    /// Clear the color of a single underlight. This has the effect of turning it off
+    /// </summary>
+    /// <param name="light">ID of the light to clear</param>
+    /// <param name="show">Whether or not to show the new color immediately</param>
+    public void ClearSingleUnderlight(TrilobotLed light, bool show = true)
+    {
+        SetUnderlight(light, 0, 0, 0, show);
+    }
+
+    #endregion
+
+    #region Helpers
+
+    /// <summary>
+    /// Sets a single underlight to a given RGB color
+    /// </summary>
+    /// <param name="light">ID of the light to set the color of</param>
+    /// <param name="color">Color to be set to</param>
+    /// <param name="show">Whether or not to show the new color immediately</param>
+    public void SetUnderlight(TrilobotLed light, Color color, bool show = true)
+    {
+        SetUnderlight(light, color.R, color.G, color.B, show);
+    }
+
+    /// <summary>
+    /// Sets a single underlight to a given HSV color
+    /// </summary>
+    /// <param name="light">ID of the light to set the color of</param>
+    /// <param name="hue"></param>
+    /// <param name="saturation"></param>
+    /// <param name="value"></param>
+    /// <param name="show">Whether or not to show the new color immediately</param>
+    public void SetUnderlightHSV(TrilobotLed light, double hue, double saturation, double value, bool show = true)
+    {
+        Color color = Utils.ColorFromHSV(hue, saturation, value);
+        SetUnderlight(light, color, show);
+    }
+
+    /// <summary>
     /// Fill all the underlights with a given RGB color
     /// </summary>
     /// <param name="r">Red component of the color</param>
@@ -72,18 +115,31 @@ public class UnderlightController : Sn3218Controller
             SetUnderlight(led, r, g, b, false);
         }
 
-        if(show)
+        if (show)
             ShowUnderlight();
     }
 
     /// <summary>
-    /// Clear the color of a single underlight. This has the effect of turning it off
+    /// Fill all the underlights with a given color
     /// </summary>
-    /// <param name="light">ID of the light to clear</param>
+    /// <param name="color">Color to be set to</param>
     /// <param name="show">Whether or not to show the new color immediately</param>
-    public void ClearSingleUnderlight(TrilobotLed light, bool show = true)
+    public void FillUnderlight(Color color, bool show = true)
     {
-        SetUnderlight(light, 0, 0, 0, show);
+        FillUnderlight(color.R, color.G, color.B, show);
+    }
+
+    /// <summary>
+    /// Sets a all underlights to a given HSV color
+    /// </summary>
+    /// <param name="hue"></param>
+    /// <param name="saturation"></param>
+    /// <param name="value"></param>
+    /// <param name="show">Whether or not to show the new color immediately</param>
+    public void FillUnderlightHsv(double hue, double saturation, double value, bool show = true)
+    {
+        Color color = Utils.ColorFromHSV(hue, saturation, value);
+        FillUnderlight(color, show);
     }
 
     /// <summary>
@@ -94,6 +150,8 @@ public class UnderlightController : Sn3218Controller
     {
         FillUnderlight(0, 0, 0, show);
     }
+
+    #endregion
 
     public async Task TestUnderlight(TimeSpan interval)
     {
