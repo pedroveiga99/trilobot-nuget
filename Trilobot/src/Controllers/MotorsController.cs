@@ -28,6 +28,8 @@ public class MotorsController : IDisposable
         motorPwmMapping.Add(pinNumber, pwm);
     }
 
+    #region Basic commands
+
     /// <summary>
     /// Sets the speed of the given motor
     /// </summary>
@@ -94,6 +96,106 @@ public class MotorsController : IDisposable
         motorPwmMapping[TrilobotPins.MOTOR_RIGHT_P].DutyCycle = 0;
     }
 
+    #endregion
+
+    #region Helpers
+
+    /// <summary>
+    /// Drives Trilobot forward
+    /// </summary>
+    /// <param name="speed">Speed to drive at, between 0.0 and 1.0</param>
+    public void Forward(double speed)
+    {
+        SetBothMotorSpeed(speed);
+    }
+
+    /// <summary>
+    /// Drives Trilobot backward
+    /// </summary>
+    /// <param name="speed">Speed to drive at, between 0.0 and 1.0</param>
+    public void Backward(double speed)
+    {
+        SetBothMotorSpeed(-speed);
+    }
+
+    /// <summary>
+    /// Turns Trilobot left
+    /// </summary>
+    /// <param name="speed">Speed to drive at, between 0.0 and 1.0</param>
+    public void TurnLeft(double speed)
+    {
+        SetMotorSpeed(TrilobotMotor.MOTOR_LEFT, -speed);
+        SetMotorSpeed(TrilobotMotor.MOTOR_RIGHT, speed);
+    }
+
+    /// <summary>
+    /// Turns Trilobot right
+    /// </summary>
+    /// <param name="speed">Speed to drive at, between 0.0 and 1.0</param>
+    public void TurnRight(double speed)
+    {
+        SetMotorSpeed(TrilobotMotor.MOTOR_LEFT, speed);
+        SetMotorSpeed(TrilobotMotor.MOTOR_RIGHT, -speed);
+    }
+
+    /// <summary>
+    /// Drives Trilobot forward and to the left
+    /// </summary>
+    /// <param name="speed">Speed to drive at, between 0.0 and 1.0</param>
+    public void CurveForwardLeft(double speed)
+    {
+        SetMotorSpeed(TrilobotMotor.MOTOR_LEFT, 0);
+        SetMotorSpeed(TrilobotMotor.MOTOR_RIGHT, speed);
+    }
+
+    /// <summary>
+    /// Drives Trilobot forward and to the right
+    /// </summary>
+    /// <param name="speed">Speed to drive at, between 0.0 and 1.0</param>
+    public void CurveForwardRight(double speed)
+    {
+        SetMotorSpeed(TrilobotMotor.MOTOR_LEFT, speed);
+        SetMotorSpeed(TrilobotMotor.MOTOR_RIGHT, 0);
+    }
+
+    /// <summary>
+    /// Drives Trilobot backward and to the left
+    /// </summary>
+    /// <param name="speed">Speed to drive at, between 0.0 and 1.0</param>
+    public void CurveBackwardLeft(double speed)
+    {
+        SetMotorSpeed(TrilobotMotor.MOTOR_LEFT, 0);
+        SetMotorSpeed(TrilobotMotor.MOTOR_RIGHT, -speed);
+    }
+
+    /// <summary>
+    /// Drives Trilobot backward and to the right
+    /// </summary>
+    /// <param name="speed">Speed to drive at, between 0.0 and 1.0</param>
+    public void CurveBackwardRight(double speed)
+    {
+        SetMotorSpeed(TrilobotMotor.MOTOR_LEFT, -speed);
+        SetMotorSpeed(TrilobotMotor.MOTOR_RIGHT, 0);
+    }
+
+    /// <summary>
+    /// Stops Trilobot from driving, sharply
+    /// </summary>
+    public void Stop()
+    {
+        SetBothMotorSpeed(0);
+    }
+
+    /// <summary>
+    /// Stops Trilobot from driving, slowly
+    /// </summary>
+    public void Coast()
+    {
+        DisableMotors();
+    }
+
+    #endregion
+
     public async Task MotorTest(TimeSpan interval)
     {
         SetBothMotorSpeed(1);
@@ -103,6 +205,7 @@ public class MotorsController : IDisposable
 
     public void Dispose()
     {
+        DisableMotors();
         foreach (SoftwarePwmChannel motorPwm in motorPwmMapping.Values)
         {
             motorPwm.Dispose();
