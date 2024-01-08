@@ -18,8 +18,6 @@ public class MotorsController : IDisposable
         SetupMotorPwm(TrilobotPins.MOTOR_RIGHT_N);
     }
 
-    public MotorsController() : this(new GpioController()) { }
-
     private void SetupMotorPwm(int pinNumber)
     {
         SoftwarePwmChannel pwm = new(pinNumber, 100, 0);

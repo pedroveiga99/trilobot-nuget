@@ -36,8 +36,6 @@ public class ButtonsController
         SetupButtonLeds(TrilobotButton.BUTTON_Y);
     }
 
-    public ButtonsController() : this(new GpioController()) { }
-
     #region Button
     private void SetupButton(TrilobotButton button)
     {
