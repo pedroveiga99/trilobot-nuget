@@ -11,12 +11,15 @@ jobs:
 
    steps:
    - name: Checkout code
-     uses: actions/checkout@v2
+     uses: actions/checkout@v4
 
-   - name: Execute shell commands
+   - name: Package and Publish NuGet
      run: |
        $env:VERSION_NAME = $env:REF_NAME.Substring(2)
-       echo $env:VERSION_NAME
+       echo "Packing and publishing version: $env:VERSION_NAME"
+       dotnet pack -p:PackageVersion="$env:VERSION_NAME"
+       ls
+       dotnet nuget push ".\Trilobot\src\bin\Release\Trilobot.$env:VERSION_NAME".nupkg --api-key "$env:NUGETKEY" -s https://api.nuget.org/v3/index.json
      shell: pwsh
      env:
        NUGETKEY: ${{ secrets.NUGETKEY }}
