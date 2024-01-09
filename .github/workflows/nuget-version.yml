@@ -17,9 +17,9 @@ jobs:
      run: |
        $env:VERSION_NAME = $env:REF_NAME.Substring(2)
        echo "Packing and publishing version: $env:VERSION_NAME"
+       cd Trilobot\src
        dotnet pack -p:PackageVersion="$env:VERSION_NAME"
-       ls
-       dotnet nuget push ".\Trilobot\src\bin\Release\Trilobot.$env:VERSION_NAME".nupkg --api-key "$env:NUGETKEY" -s https://api.nuget.org/v3/index.json
+       dotnet nuget push ".\bin\Release\Trilobot.$env:VERSION_NAME".nupkg --api-key "$env:NUGETKEY" -s https://api.nuget.org/v3/index.json
      shell: pwsh
      env:
        NUGETKEY: ${{ secrets.NUGETKEY }}
