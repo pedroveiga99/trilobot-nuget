@@ -1,4 +1,4 @@
-name: Upload a new version of the NuGet package
+name: NuGet Generation
 
 on:
  push:
@@ -7,19 +7,23 @@ on:
 
 jobs:
  build:
-   runs-on: windows-latest
+   runs-on: ubuntu-latest
+   name: Upload a new version of the NuGet package
 
    steps:
    - name: Checkout code
      uses: actions/checkout@v4
+  
+   - name: Setup .NET Core @ Latest
+     uses: actions/setup-dotnet@v3
 
    - name: Package and Publish NuGet
      run: |
        $env:VERSION_NAME = $env:REF_NAME.Substring(2)
        echo "Packing and publishing version: $env:VERSION_NAME"
-       cd Trilobot\src
-       dotnet pack -p:PackageVersion="$env:VERSION_NAME"
-       dotnet nuget push ".\bin\Release\Trilobot.$env:VERSION_NAME.nupkg" --api-key "$env:NUGETKEY" --source "https://api.nuget.org/v3/index.json"
+       cd Trilobot/src
+       dotnet pack -c Release -p:PackageVersion="$env:VERSION_NAME" -o out
+       dotnet nuget push "./out/*.nupkg" --api-key "$env:NUGETKEY" --skip-duplicate --no-symbols true
      shell: pwsh
      env:
        NUGETKEY: ${{ secrets.NUGETKEY }}
