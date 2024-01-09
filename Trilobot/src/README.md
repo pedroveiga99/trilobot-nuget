@@ -21,7 +21,7 @@ To start using your Trilobot, you need to create a `TrilobotController` object. 
 
 ## Examples
 
-There are many examples to get you started with your Trilobot. Go to the [GitHub Repository](https://github.com/pedroveiga99/trilobot-nuget/tree/main/Trilobot/examples/README.md) to check them out.
+There are many examples to get you started with your Trilobot. Go to the [GitHub Repository](https://github.com/pedroveiga99/trilobot-nuget/tree/main/Trilobot/examples) to check them out.
 
 Simple use case:
 ```csharp
