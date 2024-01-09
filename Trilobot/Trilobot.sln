@@ -5,6 +5,8 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Trilobot", "src\Trilobot.csproj", "{8F0E84D2-7B1F-4D6C-B228-05459F116277}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrilobotExamples", "examples\TrilobotExamples.csproj", "{5E9443A5-AD8F-496C-9ED4-1F09A923D12F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{8F0E84D2-7B1F-4D6C-B228-05459F116277}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F0E84D2-7B1F-4D6C-B228-05459F116277}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F0E84D2-7B1F-4D6C-B228-05459F116277}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E9443A5-AD8F-496C-9ED4-1F09A923D12F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E9443A5-AD8F-496C-9ED4-1F09A923D12F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E9443A5-AD8F-496C-9ED4-1F09A923D12F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E9443A5-AD8F-496C-9ED4-1F09A923D12F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

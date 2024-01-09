@@ -12,10 +12,18 @@ You can optionally run `sudo raspi-config` or the graphical Raspberry Pi Configu
 
 ## Getting Started
 
-**ON PROGRESS**
+To start using your Trilobot, you need to create a `TrilobotController` object. This object has multiple properties to control the different Trilobot components.
 
-To start using your Trilobot, you need to create a `TrilobotController` object. 
+* Motors => Control the Trilobot movement
+* Buttons => Get button pressed and control the buttons LEDs
+* Leds => Control the underlight LEDs
+* Ultrasound => Measure ultrasound distance
 
+## Examples
+
+There are many examples to get you started with your Trilobot. Go to the [GitHub Repository](https://github.com/pedroveiga99/trilobot-nuget/tree/main/Trilobot/examples/README.md) to check them out.
+
+Simple use case:
 ```csharp
 using Trilobot;
 
@@ -23,10 +31,4 @@ TrilobotController trilobot = new();
 
 // Turns ON all button LEDs, waits the interval given, turns OFF all button LEDs
 await trilobot.Buttons.BlinkButtonLeds(TimeSpan.FromSeconds(1));
-
-await trilobot.Motors.MotorTest(TimeSpan.FromSeconds(1));
 ```
-
-## Examples
-
-There are many examples to get you started with your Trilobot. Go to `./Trilobot/examples` and run the `TrilobotExamples` project. This is a simple Console App that let's you run multiple examples. In this project you can also chech the multiple examples code.
