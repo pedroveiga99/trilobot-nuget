@@ -1,17 +1,23 @@
 name: Upload a new version of the NuGet package
+
 on:
-  push:
-    tags:
-      - 'v-*.*.*'
+ push:
+   tags:
+     - 'v-*.*.*'
+
 jobs:
-  name: Packs and uploads new version
-  runs-on: windows-latest
-  steps:
-    - shell: pwsh
-      env:
-        SUPER_SECRET: ${{ secrets.NUGETKEY }}
-        REF_NAME: ${{ github.ref_name }}
-      run: $env:VERSION_NAME = $env:REF_NAME.Substring(2)
-      run: dotnet pack -p:PackageVersion="$env:VERSION_NAME" 
-      run: dotnet nuget push ~\Trilobot\src\bin\Release\Trilobot."$env:VERSION_NAME".nupkg --api-key "$env:VERSION_NAME" -s https://api.nuget.org/v3/index.json
-  
+ build:
+   runs-on: windows-latest
+
+   steps:
+   - name: Checkout code
+     uses: actions/checkout@v2
+
+   - name: Execute shell commands
+     run: |
+       $env:VERSION_NAME = $env:REF_NAME.Substring(2)
+       echo $env:VERSION_NAME
+     shell: pwsh
+     env:
+       NUGETKEY: ${{ secrets.NUGETKEY }}
+       REF_NAME: ${{ github.ref_name }}
