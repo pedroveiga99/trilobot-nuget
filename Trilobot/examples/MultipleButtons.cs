@@ -14,9 +14,9 @@ public static class MultipleButtons
         string exitHelp = "Press \"e\" to exit this example.";
         Console.WriteLine(exitHelp);
 
-        trilobot.buttons.OnButtonPressed += Trilobot_OnButtonPressed;
-        trilobot.buttons.OnButtonDoublePressed += Trilobot_OnButtonDoublePressed;
-        trilobot.buttons.OnButtonHolding += Trilobot_OnButtonHolding;
+        trilobot.Buttons.OnButtonPressed += Trilobot_OnButtonPressed;
+        trilobot.Buttons.OnButtonDoublePressed += Trilobot_OnButtonDoublePressed;
+        trilobot.Buttons.OnButtonHolding += Trilobot_OnButtonHolding;
 
         char? k = null;
         while (k != 'e')
@@ -25,9 +25,9 @@ public static class MultipleButtons
             Console.WriteLine(exitHelp);
         }
 
-        trilobot.buttons.OnButtonPressed -= Trilobot_OnButtonPressed;
-        trilobot.buttons.OnButtonDoublePressed -= Trilobot_OnButtonDoublePressed;
-        trilobot.buttons.OnButtonHolding -= Trilobot_OnButtonHolding;
+        trilobot.Buttons.OnButtonPressed -= Trilobot_OnButtonPressed;
+        trilobot.Buttons.OnButtonDoublePressed -= Trilobot_OnButtonDoublePressed;
+        trilobot.Buttons.OnButtonHolding -= Trilobot_OnButtonHolding;
     }
 
     private static void Trilobot_OnButtonHolding(TrilobotButton button)

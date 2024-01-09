@@ -9,35 +9,35 @@ public class TrilobotController : IDisposable
 {
     GpioController gpio;
 
-    public readonly MotorsController motors;
-    public readonly ButtonsController buttons;
-    public readonly UnderlightController leds;
-    public readonly UltrasoundController ultrasound;
+    public MotorsController Motors { get; }
+    public ButtonsController Buttons { get; }
+    public UnderlightController Leds { get; }
+    public UltrasoundController Ultrasound { get; }
 
     public TrilobotController()
     {
         gpio = new();
 
         // Setup buttons and leds
-        buttons = new(gpio);
+        Buttons = new(gpio);
 
         // Setup motor
-        motors = new(gpio);
+        Motors = new(gpio);
 
         // Setup underlight
-        leds = new();
+        Leds = new();
 
         // Setup ultrasound
-        ultrasound = new(gpio);
+        Ultrasound = new(gpio);
     }
 
     public void Close()
     {
         gpio.Dispose();
 
-        buttons.Dispose();
-        motors.Dispose();
-        leds.Dispose();
+        Buttons.Dispose();
+        Motors.Dispose();
+        Leds.Dispose();
     }
 
     public void Dispose() =>
