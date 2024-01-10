@@ -31,6 +31,8 @@ public class UltrasoundController : IDisposable
         for(int i  = 0; i < samples; i++)
         {
             timer.Reset();
+            CancellationToken cs = new CancellationTokenSource(100).Token;
+            CancellationToken combined = CancellationTokenSource.CreateLinkedTokenSource(cs, cancellationToken).Token;
 
             // Trigger
             gpio.Write(TrilobotPins.ULTRA_TRIG_PIN, PinValue.High);
@@ -39,14 +41,14 @@ public class UltrasoundController : IDisposable
 
             // Wait for the ECHO pin to go high
             // wait for the pulse rise
-            await gpio.WaitForEventAsync(TrilobotPins.ULTRA_ECHO_PIN, PinEventTypes.Rising, cancellationToken);
+            await gpio.WaitForEventAsync(TrilobotPins.ULTRA_ECHO_PIN, PinEventTypes.Rising, combined);
             timer.Start();
 
             // And wait for it to fall
-            await gpio.WaitForEventAsync(TrilobotPins.ULTRA_ECHO_PIN, PinEventTypes.Falling, cancellationToken);
+            await gpio.WaitForEventAsync(TrilobotPins.ULTRA_ECHO_PIN, PinEventTypes.Falling, combined);
             timer.Stop();
 
-            double elapsedTime = timer.ElapsedMilliseconds - offset.TotalMilliseconds;
+            double elapsedTime = timer.Elapsed.TotalMilliseconds - offset.TotalMilliseconds;
             elapsedTime = Math.Max(elapsedTime, 0); // Prevent negative readings when offset was too high
         
             totalTime += TimeSpan.FromMilliseconds(elapsedTime);
@@ -56,7 +58,7 @@ public class UltrasoundController : IDisposable
     }
 
     public static double GetDistance(int samples, TimeSpan time) =>
-        time.TotalMilliseconds * TrilobotConst.SPEED_OF_SOUND_CM_MS / (2 * samples);
+        (time.TotalMilliseconds * TrilobotConst.SPEED_OF_SOUND_CM_MS) / (2 * samples);
 
     public void Dispose()
     {
