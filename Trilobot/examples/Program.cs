@@ -20,6 +20,7 @@ internal class Program
         {
             Console.WriteLine(help);
 
+            Console.Write("Command: ");
             string? example = Console.ReadLine();
 
             switch (example)
@@ -35,5 +36,7 @@ internal class Program
                     break;
             }
         }
+
+        trilobot.Close();
     }
 }
