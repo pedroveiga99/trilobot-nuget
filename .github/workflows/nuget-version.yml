@@ -22,9 +22,11 @@ jobs:
        $env:VERSION_NAME = $env:REF_NAME.Substring(2)
        echo "Packing and publishing version: $env:VERSION_NAME"
        cd Trilobot/src
+       dotnet nuget add source --username pedroveiga99 --password "$env:TOKEN" --name github "https://nuget.pkg.github.com/pedroveiga99/index.json"
        dotnet pack -c Release -p:PackageVersion="$env:VERSION_NAME" -o out
        dotnet nuget push "./out/*.nupkg" --api-key "$env:NUGETKEY" --skip-duplicate -s "https://api.nuget.org/v3/index.json"
      shell: pwsh
      env:
+       TOKEN: ${{ secrets.GITHUB_TOKEN }}
        NUGETKEY: ${{ secrets.NUGETKEY }}
        REF_NAME: ${{ github.ref_name }}
