@@ -29,6 +29,7 @@ public static class TrilobotConst{
     // Speed of sound is 343m/s which we need in cm/ns for our distance measure
     public const double SPEED_OF_SOUND_M_S = 343;
     public const double SPEED_OF_SOUND_CM_MS = 343 * 100 / 1E6;
+    public const double SPEED_OF_SOUND_CM_NS = 343 * 100 / 1E9;
 
     public static readonly TrilobotLed[] LIGHTS_LEFT =
         [TrilobotLed.LIGHT_FRONT_LEFT, TrilobotLed.LIGHT_MIDDLE_LEFT, TrilobotLed.LIGHT_REAR_LEFT];

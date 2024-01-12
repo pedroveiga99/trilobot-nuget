@@ -57,6 +57,60 @@ public class UltrasoundController : IDisposable
         return GetDistance(samples, totalTime);
     }
 
+    public double ReadDistance(int timeout = 50, int samples = 3, long offset = 190000)
+    {
+        Stopwatch stopwatch = new Stopwatch();
+        int count = 0;
+        long totalPulseDurations = 0;
+        double distance = -999;
+
+        gpio.OpenPin(TrilobotPins.ULTRA_TRIG_PIN, PinMode.Output);
+        gpio.OpenPin(TrilobotPins.ULTRA_ECHO_PIN, PinMode.Input);
+
+        while (count < samples && stopwatch.ElapsedMilliseconds < timeout)
+        {
+            // Trigger the sensor
+            gpio.Write(TrilobotPins.ULTRA_TRIG_PIN, PinValue.High);
+            Thread.Sleep(TimeSpan.FromTicks(100)); // 10 microseconds
+            gpio.Write(TrilobotPins.ULTRA_TRIG_PIN, PinValue.Low);
+
+            stopwatch.Restart();
+
+            // Wait for the ECHO pin to go high
+            while (!(gpio.Read(TrilobotPins.ULTRA_ECHO_PIN) == PinValue.High) && stopwatch.ElapsedMilliseconds < timeout) { }
+
+            long pulseStart = stopwatch.ElapsedTicks;
+
+            // And wait for it to go low
+            while ((gpio.Read(TrilobotPins.ULTRA_ECHO_PIN) == PinValue.High) && stopwatch.ElapsedMilliseconds < timeout) { }
+
+            long pulseEnd = stopwatch.ElapsedTicks;
+
+            long pulseDuration = pulseEnd - pulseStart - offset;
+            if (pulseDuration < 0)
+            {
+                pulseDuration = 0; // Prevent negative readings when offset was too high
+            }
+
+            if (pulseDuration < timeout * 10000) // Convert timeout to ticks
+            {
+                totalPulseDurations += pulseDuration;
+                count++;
+            }
+        }
+
+        // Calculate average distance in cm if any successful readings were made
+        if (count > 0)
+        {
+            distance = totalPulseDurations * TrilobotConst.SPEED_OF_SOUND_CM_NS / (2.0 * count);
+        }
+
+        gpio.ClosePin(TrilobotPins.ULTRA_TRIG_PIN);
+        gpio.ClosePin(TrilobotPins.ULTRA_ECHO_PIN);
+
+        return distance;
+    }
+
     public static double GetDistance(int samples, TimeSpan time) =>
         (time.TotalMilliseconds * TrilobotConst.SPEED_OF_SOUND_CM_MS) / (2 * samples);
 
