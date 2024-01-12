@@ -61,13 +61,13 @@ public class UltrasoundController : IDisposable
     {
         Stopwatch stopwatch = new ();
         int count = 0;
-        long totalPulseDurations = 0;
+        double totalPulseDurations = 0;
         double distance = -999;
 
         gpio.OpenPin(TrilobotPins.ULTRA_TRIG_PIN, PinMode.Output);
         gpio.OpenPin(TrilobotPins.ULTRA_ECHO_PIN, PinMode.Input);
 
-        while (count < samples && stopwatch.ElapsedMilliseconds < timeout)
+        while (count < samples && stopwatch.Elapsed.TotalMilliseconds < timeout)
         {
             CancellationTokenSource tokenSource = new (TimeSpan.FromMilliseconds(timeout));
             // Trigger the sensor
@@ -80,14 +80,14 @@ public class UltrasoundController : IDisposable
             // Wait for the ECHO pin to go high
             await gpio.WaitForEventAsync(TrilobotPins.ULTRA_ECHO_PIN, PinEventTypes.Rising, tokenSource.Token);
 
-            long pulseStart = stopwatch.ElapsedTicks;
+            double pulseStart = stopwatch.Elapsed.TotalMilliseconds;
 
             // And wait for it to go low
             await gpio.WaitForEventAsync(TrilobotPins.ULTRA_ECHO_PIN, PinEventTypes.Falling, tokenSource.Token);
 
-            long pulseEnd = stopwatch.ElapsedTicks;
+            double pulseEnd = stopwatch.Elapsed.TotalMilliseconds;
 
-            long pulseDuration = pulseEnd - pulseStart - offset;
+            double pulseDuration = pulseEnd - pulseStart - offset * 1000;
             if (pulseDuration < 0)
             {
                 pulseDuration = 0; // Prevent negative readings when offset was too high
