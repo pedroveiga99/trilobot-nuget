@@ -38,6 +38,7 @@ public class TrilobotController : IDisposable
         Buttons.Dispose();
         Motors.Dispose();
         Leds.Dispose();
+        Ultrasound.Dispose();
     }
 
     public void Dispose() =>
