@@ -57,9 +57,9 @@ public class UltrasoundController : IDisposable
         return GetDistance(samples, totalTime);
     }
 
-    public double ReadDistance(int timeout = 50, int samples = 3, long offset = 190000)
+    public async Task<double> ReadDistance(int timeout = 50, int samples = 3, long offset = 190000)
     {
-        Stopwatch stopwatch = new Stopwatch();
+        Stopwatch stopwatch = new ();
         int count = 0;
         long totalPulseDurations = 0;
         double distance = -999;
@@ -69,20 +69,21 @@ public class UltrasoundController : IDisposable
 
         while (count < samples && stopwatch.ElapsedMilliseconds < timeout)
         {
+            CancellationTokenSource tokenSource = new (TimeSpan.FromMilliseconds(timeout));
             // Trigger the sensor
             gpio.Write(TrilobotPins.ULTRA_TRIG_PIN, PinValue.High);
-            Thread.Sleep(TimeSpan.FromTicks(100)); // 10 microseconds
+            await Task.Delay(TimeSpan.FromMicroseconds(10)); // 10 microseconds
             gpio.Write(TrilobotPins.ULTRA_TRIG_PIN, PinValue.Low);
 
             stopwatch.Restart();
 
             // Wait for the ECHO pin to go high
-            while (!(gpio.Read(TrilobotPins.ULTRA_ECHO_PIN) == PinValue.High) && stopwatch.ElapsedMilliseconds < timeout) { }
+            await gpio.WaitForEventAsync(TrilobotPins.ULTRA_ECHO_PIN, PinEventTypes.Rising, tokenSource.Token);
 
             long pulseStart = stopwatch.ElapsedTicks;
 
             // And wait for it to go low
-            while ((gpio.Read(TrilobotPins.ULTRA_ECHO_PIN) == PinValue.High) && stopwatch.ElapsedMilliseconds < timeout) { }
+            await gpio.WaitForEventAsync(TrilobotPins.ULTRA_ECHO_PIN, PinEventTypes.Falling, tokenSource.Token);
 
             long pulseEnd = stopwatch.ElapsedTicks;
 
